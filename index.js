@@ -1,7 +1,7 @@
 import fs from "fs";
 import fetch from "node-fetch";
 
-const url = "https://gist.githubusercontent.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb/raw/186528bf292b4ca0c958624c51f733d5598a5e4e/CompleteDiscordQuest.md";
+const url = "https://gist.githubusercontent.com/aamiaa/204cd9d42013ded9faf646fae7f89fbb/raw/CompleteDiscordQuest.md";
 
 async function baixarEExtrairCodigo() {
     try {

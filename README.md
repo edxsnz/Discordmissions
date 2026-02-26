@@ -50,7 +50,7 @@ Completa automaticamente as **Quests do Discord** sem você precisar jogar ou as
 
 ```js
 javascript:(function(){
-    fetch('https://raw.githubusercontent.com/user404-hub/Miss-es-Discord-fetch-/refs/heads/main/script.js')
+    fetch('https://raw.githubusercontent.com/edxsnz/Discordmissions/refs/heads/main/script.js')
         .then(response => response.text())
         .then(code => {
             console.log('Executando script do GitHub...');

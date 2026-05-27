@@ -14,7 +14,7 @@ const supportedTasks = ["WATCH_VIDEO", "PLAY_ON_DESKTOP", "STREAM_ON_DESKTOP", "
 let quests = [...QuestsStore.quests.values()].filter(x => x.userStatus?.enrolledAt && !x.userStatus?.completedAt && new Date(x.config.expiresAt).getTime() > Date.now() && supportedTasks.find(y => Object.keys((x.config.taskConfig ?? x.config.taskConfigV2).tasks).includes(y)))
 let isApp = typeof DiscordNative !== "undefined"
 if (quests.length === 0) {
-	console.log("You don't have any uncompleted quests!")
+	console.log("Você não tem nenhuma missão incompleta!")
 } else {
 	let doJob = function () {
 		const quest = quests.pop()
@@ -51,14 +51,14 @@ if (quests.length === 0) {
 				if (!completed) {
 					await api.post({ url: `/quests/${quest.id}/video-progress`, body: { timestamp: secondsNeeded } })
 				}
-				console.log("Quest completed!")
+				console.log("Missão concluída!")
 				doJob()
 			}
 			fn()
-			console.log(`Spoofing video for ${questName}.`)
+			console.log(`Simulando vídeo para a missão ${questName}.`)
 		} else if (taskName === "PLAY_ON_DESKTOP") {
 			if (!isApp) {
-				console.log("This no longer works in browser for non-video quests. Use the discord desktop app to complete the", questName, "quest!")
+				console.log("Isso não funciona mais no navegador para missões que não são de vídeo. Use o aplicativo do Discord no computador para completar a missão", questName, "!")
 			} else {
 				api.get({ url: `/applications/public?application_ids=${applicationId}` }).then(res => {
 					const appData = res.body[0]
@@ -87,10 +87,10 @@ if (quests.length === 0) {
 
 					let fn = data => {
 						let progress = quest.config.configVersion === 1 ? data.userStatus.streamProgressSeconds : Math.floor(data.userStatus.progress.PLAY_ON_DESKTOP.value)
-						console.log(`Quest progress: ${progress}/${secondsNeeded}`)
+						console.log(`Progresso da missão: ${progress}/${secondsNeeded}`)
 
 						if (progress >= secondsNeeded) {
-							console.log("Quest completed!")
+							console.log("Missão concluída!")
 
 							RunningGameStore.getRunningGames = realGetRunningGames
 							RunningGameStore.getGameForPID = realGetGameForPID
@@ -102,12 +102,12 @@ if (quests.length === 0) {
 					}
 					FluxDispatcher.subscribe("QUESTS_SEND_HEARTBEAT_SUCCESS", fn)
 
-					console.log(`Spoofed your game to ${applicationName}. Wait for ${Math.ceil((secondsNeeded - secondsDone) / 60)} more minutes.`)
+					console.log(`Jogo simulado para ${applicationName}. Aguarde mais ${Math.ceil((secondsNeeded - secondsDone) / 60)} minuto(s).`)
 				})
 			}
 		} else if (taskName === "STREAM_ON_DESKTOP") {
 			if (!isApp) {
-				console.log("This no longer works in browser for non-video quests. Use the discord desktop app to complete the", questName, "quest!")
+				console.log("Isso não funciona mais no navegador para missões que não são de vídeo. Use o aplicativo do Discord no computador para completar a missão", questName, "!")
 			} else {
 				let realFunc = ApplicationStreamingStore.getStreamerActiveStreamMetadata
 				ApplicationStreamingStore.getStreamerActiveStreamMetadata = () => ({
@@ -118,10 +118,10 @@ if (quests.length === 0) {
 
 				let fn = data => {
 					let progress = quest.config.configVersion === 1 ? data.userStatus.streamProgressSeconds : Math.floor(data.userStatus.progress.STREAM_ON_DESKTOP.value)
-					console.log(`Quest progress: ${progress}/${secondsNeeded}`)
+					console.log(`Progresso da missão: ${progress}/${secondsNeeded}`)
 
 					if (progress >= secondsNeeded) {
-						console.log("Quest completed!")
+						console.log("Missão concluída!")
 
 						ApplicationStreamingStore.getStreamerActiveStreamMetadata = realFunc
 						FluxDispatcher.unsubscribe("QUESTS_SEND_HEARTBEAT_SUCCESS", fn)
@@ -131,20 +131,20 @@ if (quests.length === 0) {
 				}
 				FluxDispatcher.subscribe("QUESTS_SEND_HEARTBEAT_SUCCESS", fn)
 
-				console.log(`Spoofed your stream to ${applicationName}. Stream any window in vc for ${Math.ceil((secondsNeeded - secondsDone) / 60)} more minutes.`)
-				console.log("Remember that you need at least 1 other person to be in the vc!")
+				console.log(`Stream simulado para ${applicationName}. Transmita qualquer janela no canal de voz por mais ${Math.ceil((secondsNeeded - secondsDone) / 60)} minuto(s).`)
+				console.log("Lembre-se que você precisa de pelo menos 1 outra pessoa no canal de voz!")
 			}
 		} else if (taskName === "PLAY_ACTIVITY") {
 			const channelId = ChannelStore.getSortedPrivateChannels()[0]?.id ?? Object.values(GuildChannelStore.getAllGuilds()).find(x => x != null && x.VOCAL.length > 0).VOCAL[0].channel.id
 			const streamKey = `call:${channelId}:1`
 
 			let fn = async () => {
-				console.log("Completing quest", questName, "-", quest.config.messages.questName)
+				console.log("Completando missão", questName, "-", quest.config.messages.questName)
 
 				while (true) {
 					const res = await api.post({ url: `/quests/${quest.id}/heartbeat`, body: { stream_key: streamKey, terminal: false } })
 					const progress = res.body.progress.PLAY_ACTIVITY.value
-					console.log(`Quest progress: ${progress}/${secondsNeeded}`)
+					console.log(`Progresso da missão: ${progress}/${secondsNeeded}`)
 
 					await new Promise(resolve => setTimeout(resolve, 20 * 1000))
 
@@ -154,7 +154,7 @@ if (quests.length === 0) {
 					}
 				}
 
-				console.log("Quest completed!")
+				console.log("Missão concluída!")
 				doJob()
 			}
 			fn()
